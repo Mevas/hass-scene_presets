@@ -42,7 +42,7 @@ async def apply_preset(
         }
 
         # Disable brightness control if it's at 0
-        if not brightness_override:
+        if brightness_override is None:
             light_params["brightness"] = preset_data.get("bri", 255)
         elif brightness_override > 0:
             light_params["brightness"] = brightness_override
