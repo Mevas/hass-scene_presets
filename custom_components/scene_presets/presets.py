@@ -41,9 +41,12 @@ async def apply_preset(
             "entity_id": entity_id,
         }
 
+        # Disable brightness control if it's at 0
         if not brightness_override:
             light_params["brightness"] = preset_data.get("bri", 255)
-            
+        elif brightness_override > 0:
+            light_params["brightness"] = brightness_override
+
         hass_state = hass.states.get(entity_id)
         if not hass_state:
             continue
