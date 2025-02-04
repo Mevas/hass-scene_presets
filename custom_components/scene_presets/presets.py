@@ -26,8 +26,6 @@ async def apply_preset(
     if not preset_data:
         raise vol.Invalid(f"Preset '{preset_id}' not found.")
 
-    brightness = brightness_override if brightness_override else preset_data.get("bri", 255)
-
     preset_colors = [(light["x"], light["y"]) for light in preset_data["lights"]]
 
     randomized_colors = None
@@ -39,10 +37,13 @@ async def apply_preset(
 
     for index, entity_id in enumerate(light_entity_ids):
         light_params = {
-            "brightness": brightness,
             "transition": transition,
             "entity_id": entity_id,
         }
+
+        if not brightness_override:
+            light_params["brightness"] = preset_data.get("bri", 255)
+            
         hass_state = hass.states.get(entity_id)
         if not hass_state:
             continue
