@@ -22,18 +22,18 @@ class DynamicScene:
         run_count = 0
 
         while self._running:
+            entity_states = [
+                (id, self.hass.states.get(id))
+                for id in self.parameters.get("light_entity_ids")
+                if id is not None
+            ]
+            lights_on = [x for x in entity_states if x[1].state == "on"]
+
             # make sure to abort when (all) the light(s) turns off
-            if run_count > 0:
-                entity_states = [
-                    self.hass.states.get(x)
-                    for x in self.parameters.get("light_entity_ids")
-                    if x is not None
-                ]
-                lights_on = len([x for x in entity_states if x.state == "on"])
-                if lights_on == 0:
-                    _LOGGER.warning("Stop running because light(s) have turned off")
-                    self._running = False
-                    return
+            if run_count > 0 and len(lights_on) == 0:
+                _LOGGER.warning("Stop running because light(s) have turned off")
+                self._running = False
+                return
 
             transition = self.parameters.get(ATTR_TRANSITION)
             smart_shuffle = True
@@ -47,7 +47,7 @@ class DynamicScene:
             await apply_preset(
                 self.hass,
                 self.parameters.get(ATTR_SCENE_PRESET_ID),
-                self.parameters.get("light_entity_ids"),
+                [id[0] for id in lights_on],
                 transition,
                 self.parameters.get(ATTR_SHUFFLE),
                 smart_shuffle,
