@@ -51,7 +51,7 @@ class DynamicScene:
                 transition,
                 self.parameters.get(ATTR_SHUFFLE),
                 smart_shuffle,
-                self.parameters.get(ATTR_BRIGHTNESS, None),
+                self.parameters.get(ATTR_BRIGHTNESS, None) if run_count == 0 else 0,
             )
             run_count += 1
 
